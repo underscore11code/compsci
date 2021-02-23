@@ -1,6 +1,6 @@
 package io.github.underscore11code.compsci;
 
-// Unit 1 Exercises 1 & 2
+// Unit 1 Exercises 1 & 3
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,23 +12,23 @@ public class MorePrinting implements Runnable {
   @Override
   public void run() {
     System.out.println("Card + Box combined");
+    System.out.println("(I made my box generator able to wrap ");
 
     BingoCard card = new BingoCard();
-    printStringList(new Boxer(card.prettyPrint()).out());
+    printStringList(new Boxer(card.prettyPrint(), 1).out());
 
     System.out.println("\nJust Card");
     printStringList(card.prettyPrint());
 
+    System.out.println("\nThe properly-sized 15 x 7 exterior sized box");
+    // Subtract 2 to account for the border, method takes interior dimensions
+    printStringList(Boxer.empty(15 - 2, 7 - 2).out());
+
     System.out.println("\nAnd a randomly sized box because I can");
     int x = random.nextInt(16);
     int y = random.nextInt(16);
-    System.out.println("Interior X size = " + x + " (+ 2 padding spaces), interior Y size = " + y);
-
-    List<String> tmp = new ArrayList<>();
-    for (int yi = 0; yi < y; yi++) {
-      tmp.add(" ".repeat(x));
-    }
-    printStringList(new Boxer(tmp).out());
+    System.out.println("Interior X size = " + x + ", interior Y size = " + y);
+    printStringList(Boxer.empty(x, y).out());
   }
 
   private static class BingoCard {
@@ -63,7 +63,7 @@ public class MorePrinting implements Runnable {
 
     public List<String> prettyPrint() {
       List<String> out = new ArrayList<>();
-      out.add("B  I  N  G  O");
+      out.add("B  I  N  G  O ");
 
       for (List<Integer> rows : cardData) {
         StringBuilder sb = new StringBuilder();
@@ -83,7 +83,7 @@ public class MorePrinting implements Runnable {
   private static class Boxer {
     private List<String> out;
 
-    public Boxer(List<String> content) {
+    public Boxer(List<String> content, int padding) {
       // Calculate the length of the longest line
       int longestLength = 0;
       for (String s : content) {
@@ -91,13 +91,14 @@ public class MorePrinting implements Runnable {
       }
       out = new ArrayList<>(content);
 
-      String header = "*".repeat(longestLength + 4);
+      String header = "*".repeat(longestLength + 2 + (padding * 2));
+      String pad = " ".repeat(padding);
 
-      // Wrap each line with * * w/ appropiate padding
+      // Wrap each line with * * w/ appropriate padding
       for (int i = 0; i < content.size(); i++) {
         String tmp = out.get(i);
         tmp = tmp + " ".repeat(longestLength - tmp.length());
-        tmp = "* " + tmp + " *";
+        tmp = "*" + pad + tmp + pad + "*";
         out.set(i, tmp);
       }
 
@@ -109,7 +110,16 @@ public class MorePrinting implements Runnable {
     public static Boxer of(String content) {
       List<String> tmp = new ArrayList<>();
       tmp.add(content);
-      return new Boxer(tmp);
+      return new Boxer(tmp, 1);
+    }
+
+    public static Boxer empty(int x, int y) {
+      List<String> tmp = new ArrayList<>();
+      for (int yi = 0; yi < y; yi++) {
+        tmp.add(" ".repeat(x));
+      }
+
+      return new Boxer(tmp, 0);
     }
 
     public List<String> out() {
