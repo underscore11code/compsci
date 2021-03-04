@@ -1,2 +1,2 @@
 language = "java10"
-run = "git pull && chmod +x ./gradlew && ./gradlew run"
+run = "git pull && chmod +x ./gradlew && ./gradlew --console=plain -q run"
